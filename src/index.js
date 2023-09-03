@@ -33,7 +33,7 @@ searchBtn.addEventListener('click', event => {
         return ;
     }
  currentPage = 1;
- fetchImages(savedItem, currentPage);
+ fetchImages(saveItem, currentPage);
 });
 
 const fetchImages = async (savedValue, currentPage) => {
@@ -68,7 +68,7 @@ try {
     loadMoreBtn.style.display = 'block';
     footer.style.display = 'flex';
 
-    galleryMarkup = imagesArray
+    markupGallery = imagesArray
       .map(image => {
         return `
         <div class="photo-card">
@@ -98,14 +98,14 @@ try {
       })
       .join('');
 
-    gallery.innerHTML = galleryMarkup;
+    gallery.innerHTML = markupGallery;
   } catch (error) {
     console.error(error);
   }
 
 
 const fetchNewImages = async (searchValue, currentPage) => {
-  let galleryMarkup = '';
+  let markupGallery = '';
   let params = new URLSearchParams({
     key: KEY_PIXI,
     q: searchValue,
@@ -129,7 +129,7 @@ const fetchNewImages = async (searchValue, currentPage) => {
       return;
     }
 
-    galleryMarkup = imagesArray
+    markupGallery = imagesArray
       .map(image => {
         return `
         <div class="photo-card">
@@ -159,13 +159,15 @@ const fetchNewImages = async (searchValue, currentPage) => {
       })
       .join('');
 
-    gallery.insertAdjacentHTML('beforeend', galleryMarkup);
-  } catch (error) {
-    console.error(error);
+    gallery.insertAdjacentHTML('beforeend', markupGallery);
+    }
+  catch (error) {
+    console.log(error);
   }
+
 };
 
-loadMoreBtn.addEventListener('click', async () => {
+loadBtn.addEventListener('click', async () => {
   const searchValue = localStorage.getItem('search-term');
   currentPage++;
   let params = new URLSearchParams({
@@ -193,7 +195,7 @@ loadMoreBtn.addEventListener('click', async () => {
 
     if (currentPage === maxPageNumberRoundUp) {
       footer.style.display = 'none';
-      loadMoreBtn.style.display = 'none';
+      loadBtn.style.display = 'none';
       Notiflix.Notify.info(
         "We're sorry, but you've reached the end of search results."
       );
@@ -205,4 +207,4 @@ loadMoreBtn.addEventListener('click', async () => {
   }
 });
 footer.style.display = 'none';
-loadMoreBtn.style.display = 'none';
+loadBtn.style.display = 'none';
