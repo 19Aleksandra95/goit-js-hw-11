@@ -1,73 +1,57 @@
 import './css/styles.css';
 import axios from 'axios';
 import Notiflix from 'notiflix';
-
-
 const searchForm = document.querySelector('.search-form');
-const searchBtn = document.querySelector("[type = 'submit']");
+const searchBtn = document.querySelector("[type='submit']");
 const gallery = document.querySelector('.gallery');
 const loadBtn = document.querySelector('.load-more');
 const footer = document.querySelector('.footer');
-
 const debounce = require('lodash.debounce');
-
 const PIXIBAY_URL = 'https://pixabay.com/api/';
 const KEY_PIXI = '39074542-79d6f6cab525b018e6eb706a0';
 const DEBOUNCE_DELAY = 100;
 const PER_PAGE = 50;
 let currentPage = 1;
-
-
-searchForm.addEventListener('input',
-debounce (event =>{
+searchForm.addEventListener(
+  'input',
+  debounce(event => {
     const searchValue = event.target.value;
-    localStorage.setItem('search item', searchValue)
-},DEBOUNCE_DELAY
-));
-
-searchBtn.addEventListener('click', event => {
-    event.preventDefault();
-    const saveItem = localStorage.getItem('search item');
-    if (saveItem === null || saveItem === '') {
-        Notiflix.Notify.info('Sorry, you must to writting something');
-        return ;
-    }
- currentPage = 1;
- fetchImages(saveItem, currentPage);
+    localStorage.setItem('search item', searchValue);
+  }, DEBOUNCE_DELAY)
+);
+searchBtn.addEventListener('click', async event => {
+  event.preventDefault();
+  const savedValue = localStorage.getItem('search item');
+  if (savedValue === null || savedValue === '') {
+    Notiflix.Notify.info('Sorry, you must write something');
+    return;
+  }
+  currentPage = 1;
+  await fetchImages(savedValue, currentPage);
 });
-
 const fetchImages = async (savedValue, currentPage) => {
-    let markupGallery = '';
-    let params = new URLSearchParams({
-        key: 'KEY_PIXI',
-        q: savedValue,
-        image_type: 'photo',
-        rientation: 'horizontal',
+  let markupGallery = '';
+  let params = new URLSearchParams({
+    key: KEY_PIXI,
+    q: savedValue,
+    image_type: 'photo',
+    orientation: 'horizontal',
     safesearch: true,
     per_page: PER_PAGE,
-    })
-};
-
-try {
+  });
+  try {
     const response = await axios.get(
-      `${PIXABAY_URL}?${params}&page=${currentPage}`
+      `${PIXIBAY_URL}?${params}&page=${currentPage}`
     );
-    
     const imagesArray = response.data.hits;
-    
-    if (searchValue === '') {
-    }
     if (imagesArray.length === 0) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
-
       return;
     }
-
-    loadMoreBtn.style.display = 'block';
+    loadBtn.style.display = 'block';
     footer.style.display = 'flex';
-
     markupGallery = imagesArray
       .map(image => {
         return `
@@ -97,13 +81,11 @@ try {
       `;
       })
       .join('');
-
     gallery.innerHTML = markupGallery;
   } catch (error) {
     console.error(error);
   }
-
-
+};
 const fetchNewImages = async (searchValue, currentPage) => {
   let markupGallery = '';
   let params = new URLSearchParams({
@@ -114,21 +96,17 @@ const fetchNewImages = async (searchValue, currentPage) => {
     safesearch: true,
     per_page: PER_PAGE,
   });
-
   try {
     const response = await axios.get(
-      `${PIXABAY_URL}?${params}&page=${currentPage}`
+      `${PIXIBAY_URL}?${params}&page=${currentPage}`
     );
-    
     const imagesArray = response.data.hits;
-    
     if (imagesArray.length === 0) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
       return;
     }
-
     markupGallery = imagesArray
       .map(image => {
         return `
@@ -158,17 +136,13 @@ const fetchNewImages = async (searchValue, currentPage) => {
       `;
       })
       .join('');
-
     gallery.insertAdjacentHTML('beforeend', markupGallery);
-    }
-  catch (error) {
-    console.log(error);
+  } catch (error) {
+    console.error(error);
   }
-
 };
-
 loadBtn.addEventListener('click', async () => {
-  const searchValue = localStorage.getItem('search-term');
+  const searchValue = localStorage.getItem('search item');
   currentPage++;
   let params = new URLSearchParams({
     key: KEY_PIXI,
@@ -180,19 +154,13 @@ loadBtn.addEventListener('click', async () => {
   });
   try {
     const response = await axios.get(
-      `${PIXABAY_URL}?${params}&page=${currentPage}`
+      `${PIXIBAY_URL}?${params}&page=${currentPage}`
     );
-
     const imagesArray = response.data.hits;
     const imagesPerPage = PER_PAGE;
-
     const totalImages = response.data.totalHits;
     const maxPageNumber = totalImages / imagesPerPage;
     const maxPageNumberRoundUp = Math.ceil(maxPageNumber);
-    console.log('currentPage: ', currentPage);
-    console.log('maxPageNumber: ', maxPageNumber);
-    console.log('maxPageNumberRoundUp: ', maxPageNumberRoundUp);
-
     if (currentPage === maxPageNumberRoundUp) {
       footer.style.display = 'none';
       loadBtn.style.display = 'none';
@@ -200,11 +168,22 @@ loadBtn.addEventListener('click', async () => {
         "We're sorry, but you've reached the end of search results."
       );
     }
-
-    fetchNewImages(searchValue, currentPage);
+    await fetchNewImages(searchValue, currentPage);
   } catch (error) {
     console.error(error);
   }
 });
 footer.style.display = 'none';
 loadBtn.style.display = 'none';
+
+
+
+
+
+
+
+
+
+
+
+
