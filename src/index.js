@@ -1,12 +1,22 @@
 import './css/styles.css';
 import axios from 'axios';
 import Notiflix from 'notiflix';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
+
 const searchForm = document.querySelector('.search-form');
 const searchBtn = document.querySelector("[type='submit']");
 const gallery = document.querySelector('.gallery');
 const loadBtn = document.querySelector('.load-more');
 const footer = document.querySelector('.footer');
+
 const debounce = require('lodash.debounce');
+
+const lightbox = new SimpleLightbox('.gallery a', {
+  captionDelay: 250,
+  captionsData: 'alt',
+});
+
 const PIXIBAY_URL = 'https://pixabay.com/api/';
 const KEY_PIXI = '39074542-79d6f6cab525b018e6eb706a0';
 const DEBOUNCE_DELAY = 100;
@@ -83,7 +93,7 @@ const fetchImages = async (savedValue, currentPage) => {
       .join('');
     gallery.innerHTML = markupGallery;
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 };
 const fetchNewImages = async (searchValue, currentPage) => {
@@ -138,7 +148,7 @@ const fetchNewImages = async (searchValue, currentPage) => {
       .join('');
     gallery.insertAdjacentHTML('beforeend', markupGallery);
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 };
 loadBtn.addEventListener('click', async () => {
@@ -170,11 +180,13 @@ loadBtn.addEventListener('click', async () => {
     }
     await fetchNewImages(searchValue, currentPage);
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 });
 footer.style.display = 'none';
 loadBtn.style.display = 'none';
+
+
 
 
 
